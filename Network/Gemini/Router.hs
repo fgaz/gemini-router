@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE CPP #-}
 module Network.Gemini.Router (
 -- * The Route monad transformer
   RouteT
@@ -26,6 +27,10 @@ import Control.Monad.Trans.Class (MonadTrans(..))
 import Control.Monad.IO.Class (MonadIO(..))
 
 import Network.URI (uriQuery, pathSegments, unEscapeString)
+
+#if __GLASGOW_HASKELL__ < 808
+import Control.Monad.Fail (MonadFail(..))
+#endif
 
 
 -- The RouteT monad transformer

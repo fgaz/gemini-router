@@ -16,7 +16,7 @@ extra-source-files:  CHANGELOG.md
 library
   exposed-modules:     Network.Gemini.Router
   -- other-modules:
-  other-extensions:    FlexibleInstances
+  other-extensions:    FlexibleInstances, CPP
   build-depends:       base
                      , gemini-server
                      , transformers
