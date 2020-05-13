@@ -117,8 +117,8 @@ optionalInput f = RouteT $ \req path -> case uriQuery req of
   _         -> runRouteT (f Nothing)                       req path
 
 custom :: (Request
-       -> [String] -- ^ Remaining path
-       -> m (Maybe a) -- ^ A Nothing makes the request fall through
+       -> [String] -- Remaining path
+       -> m (Maybe a) -- A Nothing makes the request fall through
        ) -> RouteT m a
 custom = RouteT
 
