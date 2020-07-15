@@ -2,16 +2,21 @@ cabal-version:       2.2
 
 name:                gemini-router
 version:             0.1.0.0
--- synopsis:
+synopsis:            A simple Happstack-style Gemini router
 -- description:
--- bug-reports:
+homepage:            https://sr.ht/~fgaz/haskell-gemini/
+bug-reports:         https://todo.sr.ht/~fgaz/haskell-gemini
 license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Francesco Gazzetta
-maintainer:          fgaz@fgaz.me
--- copyright:
+maintainer:          Francesco Gazzetta <fgaz@fgaz.me>
+copyright:           © 2020 Francesco Gazzetta and contributors
 category:            Gemini
 extra-source-files:  CHANGELOG.md
+
+source-repository head
+  type:                git
+  location:            https://git.sr.ht/~fgaz/gemini-router
 
 library
   exposed-modules:     Network.Gemini.Router
