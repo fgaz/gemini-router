@@ -15,6 +15,9 @@ module Network.Gemini.Router (
 , input
 , optionalInput
 , custom
+-- * Getters
+, getRequest
+, getPath
 ) where
 
 import Network.Gemini.Server
@@ -149,4 +152,13 @@ optionalInput f = RouteT $ \req path -> case uriQuery req of
 -- request fall through to the next route
 custom :: (Request -> [String] -> m (Maybe a)) -> RouteT m a
 custom = RouteT
+
+-- Getters
+-------------------------------
+
+getRequest :: Applicative m => RouteT m Request
+getRequest = RouteT $ \req _ -> pure $ Just req
+
+getPath :: Applicative m => RouteT m [String]
+getPath = RouteT $ \_ path -> pure $ Just path
 
