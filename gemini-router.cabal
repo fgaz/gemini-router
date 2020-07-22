@@ -3,7 +3,11 @@ cabal-version:       2.2
 name:                gemini-router
 version:             0.1.0.0
 synopsis:            A simple Happstack-style Gemini router
--- description:
+description:
+  This package contains a 'Router' monad transformer that works on top of the
+  gemini-server package, with a functional+monadic+alternative interface,
+  similar to Happstack. With it you can define gemini endpoints, capture parts
+  of the request, and pass the requests to specific handlers.
 homepage:            https://sr.ht/~fgaz/haskell-gemini/
 bug-reports:         https://todo.sr.ht/~fgaz/haskell-gemini
 license:             BSD-3-Clause
