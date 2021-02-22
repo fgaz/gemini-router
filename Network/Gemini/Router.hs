@@ -14,6 +14,8 @@ module Network.Gemini.Router (
 , capture
 , input
 , optionalInput
+, cert
+, optionalCert
 , custom
 -- * Getters
 , getRequest
@@ -30,6 +32,7 @@ import Control.Monad.Trans.Class (MonadTrans(..))
 import Control.Monad.IO.Class (MonadIO(..))
 
 import Network.URI (uriQuery, pathSegments, unEscapeString)
+import OpenSSL.X509 (X509)
 
 #if __GLASGOW_HASKELL__ < 808
 import Control.Monad.Fail (MonadFail(..))
@@ -91,7 +94,7 @@ runRouteT' :: (m (Maybe Response) -> IO (Maybe Response)) -- ^ Inner @run@
 runRouteT' runM r req = fromMaybe notFound <$> runM (runRouteT r req path)
   where
     notFound = Response 51 "Not found" mempty
-    path = unEscapeString <$> pathSegments req
+    path = unEscapeString <$> pathSegments (requestURI req)
 
 -- Building Routes
 -------------------------------
@@ -132,7 +135,7 @@ input :: Applicative f
                                        -- and returns the route to run on the
                                        -- rest of the path
       -> RouteT f Response
-input q f = RouteT $ \req path -> case uriQuery req of
+input q f = RouteT $ \req path -> case uriQuery $ requestURI req of
   '?':query -> runRouteT (f $ unEscapeString query) req path
   _         -> pure $ pure $ Response 10 q mempty
 
@@ -143,9 +146,30 @@ optionalInput :: Applicative f
                                               -- returns the route to run on
                                               -- the rest of the path
               -> RouteT f a
-optionalInput f = RouteT $ \req path -> case uriQuery req of
+optionalInput f = RouteT $ \req path -> case uriQuery $ requestURI req of
   '?':query -> runRouteT (f $ Just $ unEscapeString query) req path
   _         -> runRouteT (f Nothing)                       req path
+
+-- | Require a client certificate, returning an error (code 60) if absent
+cert :: Applicative m
+     => String -- ^ String to return to the client if there is no
+               -- client certificate in the request
+     -> (X509 -> RouteT m Response) -- ^ Function that takes the client
+                                    -- certificate and returns the route to run
+                                    -- on the rest of the request
+     -> RouteT m Response
+cert msg f = RouteT $ \req path -> case requestCert req of
+  Just c  -> runRouteT (f c) req path
+  Nothing -> pure $ pure $ Response 60 msg mempty
+
+-- | Obtain, if present, the client certificate
+optionalCert :: Applicative m
+             => (Maybe X509 -> RouteT m Response)
+             -- ^ Function that takes the client certificate (if present)
+             -- and returns the route to run on the rest of the request
+             -> RouteT m Response
+optionalCert f = RouteT $ \req path ->
+  runRouteT (f $ requestCert req) req path
 
 -- | Build custom routes. Takes a function that takes the request and the
 -- remaining path segments and returns the result. A 'Nothing' makes the
@@ -161,4 +185,3 @@ getRequest = RouteT $ \req _ -> pure $ Just req
 
 getPath :: Applicative m => RouteT m [String]
 getPath = RouteT $ \_ path -> pure $ Just path
-
