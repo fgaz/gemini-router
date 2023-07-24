@@ -10,6 +10,7 @@ module Network.Gemini.Router (
 , runRouteT'
 -- * Building Routes
 , end
+, domain
 , dir
 , capture
 , input
@@ -31,7 +32,8 @@ import Control.Applicative (Alternative(..))
 import Control.Monad.Trans.Class (MonadTrans(..))
 import Control.Monad.IO.Class (MonadIO(..))
 
-import Network.URI (uriQuery, pathSegments, unEscapeString)
+import Network.URI
+  ( uriQuery, pathSegments, unEscapeString, uriAuthority, uriRegName )
 import OpenSSL.X509 (X509)
 
 #if __GLASGOW_HASKELL__ < 808
@@ -106,6 +108,17 @@ end :: Applicative f
 end r = RouteT $ \req path -> case path of
   [] -> runRouteT r req path
   _ -> pure Nothing
+
+-- | Match on a specified domain
+-- @since 0.1.2.0
+domain :: Applicative f
+       => String -- ^ What the domain must match
+       -> RouteT f a -- ^ route to run on match
+       -> RouteT f a
+domain d r = RouteT $ \req path ->
+  if Just d == fmap uriRegName (uriAuthority $ requestURI req)
+  then runRouteT r req path
+  else pure Nothing
 
 -- | Match on a specific path segment
 dir :: Applicative f
