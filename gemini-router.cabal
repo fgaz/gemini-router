@@ -1,7 +1,7 @@
 cabal-version:       2.2
 
 name:                gemini-router
-version:             0.1.1.0
+version:             0.1.2.0
 synopsis:            A simple Happstack-style Gemini router
 description:
   This package contains a 'Router' monad transformer that works on top of the

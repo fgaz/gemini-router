@@ -1,5 +1,9 @@
 # Revision history for gemini-router
 
+## 0.1.2.0 -- 2023-07-24
+
+* Add domain combinator
+
 ## 0.1.1.0 -- 2021-02-22
 
 * SSL/TLS support
